@@ -1,0 +1,73 @@
+FROM artifactory.momenta.works/docker-momenta/build_env_devcar_momenta_cmake_with_cuda:v0.0.2
+
+# install ros
+RUN zsh -c "sudo apt-get update"
+RUN zsh -c "sudo sh -c 'echo \"deb http://packages.ros.org/ros/ubuntu xenial main\" > /etc/apt/sources.list.d/ros-latest.list'"
+RUN zsh -c "sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654"
+RUN zsh -c "sudo apt-get update && sudo apt-get install -y ros-kinetic-desktop-full"
+RUN zsh -c "sudo rosdep init && rosdep update"
+RUN zsh -c "conda install -c conda-forge lsb-release -y"
+RUN zsh -c "sudo apt-get install ros-kinetic-can-msgs ros-kinetic-tf2-ros ros-kinetic-tf ros-kinetic-jsk-rviz-plugins -y"
+RUN zsh -c "python3 -m pip install catkin_pkg"
+
+# install dependency
+RUN zsh -c "sudo apt-get update"
+RUN zsh -c "sudo apt-get install -y sshpass rpm gnutls-dev pkg-config iputils-clockdiff"
+
+# update python + cmake
+RUN zsh -c "python3 -m pip install --upgrade pip"
+RUN zsh -c "python3 -m pip install --upgrade cmake==3.20.2"
+RUN zsh -c "python3 -m pip install tmuxp"
+
+# install mf_system.pipeline
+RUN zsh -c "python3 -m pip install --extra-index-url https://artifactory.momenta.works/artifactory/api/pypi/pypi-momenta/simple mf_system -U"
+RUN zsh -c "python3 -m pip install --extra-index-url https://artifactory.momenta.works/artifactory/api/pypi/pypi-momenta/simple run_in_build_env -U"
+RUN zsh -c "python3 -m pip install wheel conan toposort loguru empy"
+
+# install tools
+RUN zsh -c "sudo apt-get install -y awscli"
+RUN zsh -c "sudo apt-get install -y iputils-ping"
+RUN zsh -c "sudo apt-get install -y net-tools"
+
+# other config
+RUN zsh -c "sudo mkdir -p /root/catkin_ws/src"
+RUN zsh -c "echo 'if [ -e \"/opt/ros/kinetic/setup.zsh\" ];then' >> ~/.zshrc"
+RUN zsh -c "echo '    source /opt/ros/kinetic/setup.zsh' >> ~/.zshrc"
+RUN zsh -c "echo 'fi' >> ~/.zshrc"
+RUN zsh -c "echo 'if [ -e \"/opt/ros/kinetic/setup.bash\" ];then' >> ~/.bashrc"
+RUN zsh -c "echo '    source /opt/ros/kinetic/setup.bash' >> ~/.bashrc"
+RUN zsh -c "echo 'fi' >> ~/.bashrc"
+
+ENV PATH=/opt/ros/kinetic/bin:$PATH \
+    CMAKE_PREFIX_PATH=/opt/ros/kinetic \
+    LD_LIBRARY_PATH=/opt/ros/kinetic/lib:/opt/ros/kinetic/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH \
+    PKG_CONFIG_PATH=/opt/ros/kinetic/lib/pkgconfig:/opt/ros/kinetic/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH \
+    PYTHONPATH=/opt/ros/kinetic/lib/python2.7/dist-packages:$PYTHONPATH \
+    ROS_ETC_DIR=/opt/ros/kinetic/etc/ros \
+    ROS_PACKAGE_PATH=/opt/ros/kinetic/share \
+    ROS_ROOT=/opt/ros/kinetic/share/ros \
+    ROS_DISTRO=kinetic \
+    ROS_PYTHON_VERSION=2 \
+    ROS_VERSION=1 \
+    ROSLISP_PACKAGE_DIRECTORIES= \
+    DFDI_BUILD_ENV=dfdi_ros_dev_core \
+    CONTAINER_HOME=/root \
+    CONTAINER_AUTO_WS=/root/catkin_ws
+
+
+
+
+
+
+
+//next is som commands
+docker pull artifactory.momenta.works/docker-momenta/build_env_devcar_momenta_cmake_qt5:v0.0.11
+docker run -di --name qt5 artifactory.momenta.works/docker-momenta/build_env_devcar_momenta_cmake_qt5:v0.0.11
+docker exec -it qt5 /bin/bash
+9be4f37c4bc7d904d3c191d091a114a7c4a848e0e23f048d9aadec2a02f80277
+
+root@9be4f37c4bc7
+ docker commit -a="qt for ros" -m="qt for ros" qt5 artifactory.momenta.works/docker-momenta/build_env_devcar_momenta_cmake_qt5:v0.0.11
+sha256:be812b6b6a3d185e7991c5009fa9bca8de3c00a55086c72606a466d2015d2085
+docker image push artifactory.momenta.works/docker-momenta/build_env_devcar_momenta_cmake_qt5:v0.0.11
+docker tag 49cdecd77ece  artifactory.momenta.works/docker-momenta/build_env_devcar_momenta_cmake_qt5:v0.0.13
