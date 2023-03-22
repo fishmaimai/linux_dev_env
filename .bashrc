@@ -138,3 +138,4 @@ export MFR_IP=10.8.106.94
 export MFR_MASTER_URI=mfrrpc://10.8.106.94:11300
 ulimit -c unlimited
 export LOG_CONFIG_DIR=/media/data0/fish/mf_system_lianhuashan/mff_lianhuashan
+export DISPLAY=:10.0
